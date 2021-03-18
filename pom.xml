@@ -14,10 +14,18 @@
     </properties>
 
     <dependencies>
+        <!-- 식 파싱 -->
         <dependency>
             <groupId>com.fathzer</groupId>
             <artifactId>javaluator</artifactId>
             <version>3.0.3</version>
+        </dependency>
+
+        <!-- 그래프 -->
+        <dependency>
+            <groupId>com.panayotis</groupId>
+            <artifactId>javaplot</artifactId>
+            <version>0.5.0</version>
         </dependency>
     </dependencies>
 </project>
