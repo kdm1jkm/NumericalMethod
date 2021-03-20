@@ -3,3 +3,6 @@ target
 out
 graph.gp
 output.csv
+.classpath
+.project
+.settings
