@@ -27,40 +27,17 @@ public class Main {
         double max = scanner.nextDouble();
 
         System.out.print("Enter eps>>");
-//        int count = scanner.nextInt();
-//        if (count == -1)
-//            count = 1000000;
-//        double eps = (max - min) / count;
-
         double eps = scanner.nextDouble();
-        int count = (int) ((max - min) / eps) + 1;
 
+        int count = (int) ((max - min) / eps) + 1;
 
         scanner.close();
 
-        DoubleEvaluator evaluator = new DoubleEvaluator();
-        StaticVariableSet<Double> variables = new StaticVariableSet<>();
-
         long start = System.currentTimeMillis();
 
-        double[] xs = new double[count];
-        for (int i = 0; i < count; i++) {
-            double value = min + (max - min) / count * i;
-            xs[i] = value;
-        }
-
-        double[] values = new double[count];
-        for (int i = 0; i < count; i++) {
-            variables.set("x", xs[i]);
-            double value = evaluator.evaluate(expression, variables);
-            values[i] = value;
-        }
-
-        double[] diffs = new double[count];
-        for (int i = 1; i < count - 1; i++) {
-            double value = (values[i + 1] - values[i - 1]) / (eps * 2);
-            diffs[i] = value;
-        }
+        double[] xs = getXs(min, max, count);
+        double[] values = getValues(expression, xs);
+        double[] diffs = getDiffs(values, eps);
 
         printElapsed(start);
 
@@ -68,6 +45,36 @@ public class Main {
                 new DrawableGraph(xs, values, 0, 0, xs.length, expression),
                 new DrawableGraph(xs, diffs, 0, 0, diffs.length, "d/dx " + expression)
         );
+    }
+
+    private static double[] getDiffs(double[] values, double eps) {
+        double[] result = new double[values.length];
+        for (int i = 1; i < result.length - 1; i++) {
+            double value = (values[i + 1] - values[i - 1]) / (eps * 2);
+            result[i] = value;
+        }
+        return result;
+    }
+
+    private static double[] getValues(String expression, double[] xs) {
+        double[] result = new double[xs.length];
+        StaticVariableSet<Double> variables = new StaticVariableSet<>();
+        DoubleEvaluator evaluator = new DoubleEvaluator();
+        for (int i = 0; i < result.length; i++) {
+            variables.set("x", xs[i]);
+            double value = evaluator.evaluate(expression, variables);
+            result[i] = value;
+        }
+        return result;
+    }
+
+    private static double[] getXs(double min, double max, int count) {
+        double[] xs = new double[count];
+        for (int i = 0; i < count; i++) {
+            double value = min + (max - min) / count * i;
+            xs[i] = value;
+        }
+        return xs;
     }
 
     private static void printElapsed(long start) {
