@@ -43,7 +43,12 @@ public class Main {
         DoubleEvaluator evaluator = new DoubleEvaluator();
         for (int i = 0; i < result.length; i++) {
             variables.set("x", xs[i]);
-            double value = evaluator.evaluate(expression, variables);
+            double value = 0;
+            try {
+                value = evaluator.evaluate(expression, variables);
+            } catch (IllegalArgumentException e) {
+                value = Double.NaN;
+            }
             result[i] = value;
         }
         return result;
