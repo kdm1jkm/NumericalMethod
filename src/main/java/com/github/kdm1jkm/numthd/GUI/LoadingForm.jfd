@@ -1,0 +1,27 @@
+JFDML JFormDesigner: "7.0.3.0.337" Java: "11.0.10" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq {space :::p, par l {comp label1::l:p::p, comp progressBar::l:p:288:p}, space ::4:x}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp label1:::p::p, space u:::p, comp progressBar:::p::p, space ::9:x}}"
+		} ) {
+			name: "this"
+			"title": "Generation..."
+			add( new FormComponent( "javax.swing.JProgressBar" ) {
+				name: "progressBar"
+				auxiliary() {
+					"JavaCodeGenerator.variableModifiers": 1
+				}
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": "Generation..."
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 300, 80 )
+		} )
+	}
+}

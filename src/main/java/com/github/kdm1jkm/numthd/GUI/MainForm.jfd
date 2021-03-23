@@ -74,6 +74,7 @@ new FormModel {
 					minimum: 1
 					value: 2000
 				}
+				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_countStateChanged", true ) )
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

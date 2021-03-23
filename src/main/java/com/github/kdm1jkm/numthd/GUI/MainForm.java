@@ -6,6 +6,9 @@ package com.github.kdm1jkm.numthd.GUI;
 
 import com.github.kdm1jkm.numthd.DrawableGraph;
 import com.github.kdm1jkm.numthd.Main;
+import com.github.kdm1jkm.numthd.calc.DiffFunc;
+import com.github.kdm1jkm.numthd.calc.IdentityFunc;
+import com.github.kdm1jkm.numthd.calc.NormalFunc;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -38,11 +41,15 @@ public class MainForm extends JFrame {
 
     private void btn_calculate_clicked(ActionEvent e) {
         new Thread(() -> {
-            double[] xs = Main.getXs(getMin(), getMax(), getCount());
+            LoadingForm loading = new LoadingForm(3);
+            loading.setVisible(true);
+            loading.setValue(1);
+            double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loading.progressBar);
             double[] values;
 
             try {
-                values = Main.getValues(txtFld_expression.getText(), xs);
+                loading.setValue(2);
+                values = new NormalFunc(xs, txtFld_expression.getText()).calculate(loading.progressBar);
                 if (Arrays.stream(values).allMatch(Double::isNaN)) {
                     throw new IllegalArgumentException("Illegal expression");
                 }
@@ -54,8 +61,10 @@ public class MainForm extends JFrame {
                 return;
             }
 
-            double[] diffs = Main.getDiffs(values, getEps());
+            loading.setValue(3);
+            double[] diffs = new DiffFunc(values, getEps()).calculate(loading.progressBar);
 
+            loading.setVisible(false);
             Main.drawGraph(
                     new DrawableGraph(xs, values, 0, 0, getCount(), "f(x)"),
                     new DrawableGraph(xs, diffs, 0, 0, getCount(), "f'(x)")
@@ -78,6 +87,12 @@ public class MainForm extends JFrame {
     }
 
     private void updateCount() {
+        spinner_count.setValue(getCount());
+    }
+
+    private void spinner_countStateChanged(ChangeEvent e) {
+        double value = (getMax() - getMin()) / (int) spinner_count.getValue();
+        spinner_eps.setValue(Math.max(value, .0001));
         spinner_count.setValue(getCount());
     }
 
@@ -138,6 +153,7 @@ public class MainForm extends JFrame {
 
         //---- spinner_count ----
         spinner_count.setModel(new SpinnerNumberModel(2000, 1, null, 1));
+        spinner_count.addChangeListener(e -> spinner_countStateChanged(e));
 
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
