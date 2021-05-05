@@ -19,6 +19,7 @@ public class Main {
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
 //            UIManager.setLookAndFeel(new FlatDarculaLaf());
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }

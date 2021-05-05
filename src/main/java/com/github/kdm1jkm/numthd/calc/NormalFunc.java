@@ -31,6 +31,9 @@ public class NormalFunc implements Func {
                     data[i] = evaluator.evaluate(expression, variables);
                 } catch (Exception e) {
                     data[i] = Double.NaN;
+                    System.out.printf("x = %g\n", x[i]);
+                    System.out.println(e.getMessage());
+                    System.out.println("---------------------------");
                 }
                 progressBar.setValue(i);
             }
