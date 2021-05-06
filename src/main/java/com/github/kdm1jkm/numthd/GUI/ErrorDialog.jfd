@@ -11,13 +11,21 @@ new FormModel {
 				name: "dialogPane"
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-					"$horizontalGroup": "par l {seq l {space :::p, comp label1:::p::p, space ::107:x}}"
-					"$verticalGroup": "par l {seq l {space :::p, comp label1:::p::p, space ::54:x}}"
+					"$horizontalGroup": "par l {seq l {space :::p, par l {comp scrollPane1::::387:x, seq {comp label1:::p::p, space :0:348:x}}, space :::p}}"
+					"$verticalGroup": "par l {seq l {space :::p, comp label1:::p::p, space :::p, comp scrollPane1::::182:x, space :::p}}"
 				} ) {
 					name: "contentPanel"
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "label1"
-						"text": "Wrong Input!"
+						"text": "ERROR!"
+					} )
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "scrollPane1"
+						add( new FormComponent( "javax.swing.JTextArea" ) {
+							name: "textArea_content"
+							"editable": false
+							"text": "asdasd"
+						} )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "Center"
@@ -45,7 +53,7 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 190, 155 )
+			"size": new java.awt.Dimension( 425, 315 )
 		} )
 	}
 }

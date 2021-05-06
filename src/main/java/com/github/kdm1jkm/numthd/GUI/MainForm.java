@@ -4,7 +4,6 @@
 
 package com.github.kdm1jkm.numthd.GUI;
 
-import java.awt.*;
 import com.github.kdm1jkm.numthd.DrawableGraph;
 import com.github.kdm1jkm.numthd.Main;
 import com.github.kdm1jkm.numthd.calc.DiffFunc;
@@ -12,14 +11,9 @@ import com.github.kdm1jkm.numthd.calc.IdentityFunc;
 import com.github.kdm1jkm.numthd.calc.NormalFunc;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author unknown
@@ -27,10 +21,19 @@ import java.util.List;
 public class MainForm extends JFrame {
     public MainForm() {
         initComponents();
+        update();
     }
 
     private double getEps() {
-        return (double) spinner_eps.getValue();
+        if (radioButton_eps.isSelected()) {
+            return (double) spinner_eps.getValue();
+        } else {
+            return getInterval() / getCount();
+        }
+    }
+
+    private double getInterval() {
+        return getMax() - getMin();
     }
 
     private double getMax() {
@@ -42,74 +45,108 @@ public class MainForm extends JFrame {
     }
 
     private int getCount() {
-        return (int) ((getMax() - getMin()) / getEps());
+        if (radioButton_count.isSelected()) {
+            return (int) spinner_count.getValue();
+        } else {
+            return (int) (getInterval() / getEps());
+        }
     }
 
     private void btn_calculate_clicked(ActionEvent e) {
         new Thread(() -> {
-            List<DrawableGraph> graphs = new ArrayList<>();
-            LoadingForm loading = new LoadingForm(2);
-            loading.setVisible(true);
-            loading.setValue(1);
-            double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loading.progressBar);
-            double[] values;
-
-            try {
+            if (radioButton_original.isSelected()) {
+                LoadingForm loading = new LoadingForm(2);
+                loading.setVisible(true);
+                loading.setValue(1);
+                double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loading.progressBar);
                 loading.setValue(2);
-                values = new NormalFunc(xs, txtFld_expression.getText()).calculate(loading.progressBar);
-                if (Arrays.stream(values).allMatch(Double::isNaN)) {
-                    throw new IllegalArgumentException("Illegal expression");
+                double[] values;
+                try {
+                    values = new NormalFunc(xs, getExpression()).calculate(loading.progressBar);
+                    if (Arrays.stream(values).allMatch(Double::isNaN)) {
+                        throw new IllegalArgumentException("Illegal expression");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    ErrorDialog dialog = new ErrorDialog(this);
+                    dialog.setContent(ex.getMessage());
+                    dialog.setVisible(true);
+                    return;
+                } finally {
+
+                    loading.setVisible(false);
                 }
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-                ErrorDialog dialog = new ErrorDialog(this);
-                loading.setVisible(false);
-                dialog.setVisible(true);
-                return;
+                Main.drawGraph(new DrawableGraph(xs, values, 0, 0, getCount(), "f(x)"));
+            } else if (radioButton_derivate.isSelected()) {
+                LoadingForm loading = new LoadingForm(3);
+                loading.setVisible(true);
+                loading.setValue(1);
+                double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loading.progressBar);
+
+                loading.setValue(2);
+                double[] values;
+                double[] diffs;
+
+                try {
+                    values = new NormalFunc(xs, getExpression()).calculate(loading.progressBar);
+                    if (Arrays.stream(values).allMatch(Double::isNaN)) {
+                        throw new IllegalArgumentException("Illegal expression");
+                    }
+
+                    loading.setValue(3);
+                    diffs = new DiffFunc(values, getEps()).calculate(loading.progressBar);
+                    if (Arrays.stream(diffs).allMatch(Double::isNaN)) {
+                        throw new IllegalArgumentException("Illegal expression");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    ErrorDialog dialog = new ErrorDialog(this);
+                    dialog.setContent(ex.getMessage());
+                    dialog.setVisible(true);
+                    return;
+                } finally {
+                    loading.setVisible(false);
+                }
+                Main.drawGraph(new DrawableGraph(xs, diffs, 0, 0, getCount(), "f'(x)"));
+            } else if (radioButton_integral.isSelected()) {
+                // TODO
             }
-
-            graphs.add(new DrawableGraph(xs, values, 0, 0, getCount(), "f(x)"));
-
-            if (checkBox_diff.isSelected()) {
-                loading.setValue(3);
-                double[] diffs = new DiffFunc(values, getEps()).calculate(loading.progressBar);
-                graphs.add(new DrawableGraph(xs, diffs, 0, 0, getCount(), "f'(x)"));
-            }
-
-            loading.setVisible(false);
-            Main.drawGraph(graphs.toArray(new DrawableGraph[0]));
         }).start();
+    }
+
+    private String getExpression() {
+        return txtFld_expression.getText();
     }
 
     private void spinner_minStateChanged(ChangeEvent e) {
         spinner_max.setValue(Math.max(getMax(), getMin()));
-        updateCount();
+        update();
     }
 
     private void spinner_maxStateChanged(ChangeEvent e) {
         spinner_min.setValue(Math.min(getMin(), getMax()));
-        updateCount();
+        update();
     }
 
     private void spinner_epsStateChanged(ChangeEvent e) {
-        updateCount();
+        update();
     }
 
-    private void updateCount() {
-        spinner_count.setValue(getCount());
+    private void update() {
+        if (radioButton_count.isSelected()) {
+            spinner_eps.setValue(getEps());
+        } else {
+            spinner_count.setValue(getCount());
+        }
     }
 
     private void spinner_countStateChanged(ChangeEvent e) {
-        double value = (getMax() - getMin()) / (int) spinner_count.getValue();
-        spinner_eps.setValue(Math.max(value, Double.MIN_NORMAL));
-        spinner_count.setValue(getCount());
+        update();
     }
 
-    private void txtFld_integralConstantKeyTyped(KeyEvent e) {
-        if (!Character.isDigit(e.getKeyChar())) {
-            e.consume();
-        }
+    private void radioButton_Clicked(ActionEvent e) {
+        spinner_eps.setEnabled(radioButton_eps.isSelected());
+        spinner_count.setEnabled(radioButton_count.isSelected());
     }
 
     private void initComponents() {
@@ -120,8 +157,6 @@ public class MainForm extends JFrame {
         separator1 = new JSeparator();
         label2 = new JLabel();
         label3 = new JLabel();
-        label4 = new JLabel();
-        lbl_count = new JLabel();
         separator2 = new JSeparator();
         btn_calculate = new JButton();
         spinner_min = new JSpinner();
@@ -129,8 +164,11 @@ public class MainForm extends JFrame {
         spinner_eps = new JSpinner();
         spinner_count = new JSpinner();
         separator3 = new JSeparator();
-        panel1 = new JPanel();
-        checkBox_diff = new JCheckBox();
+        radioButton_derivate = new JRadioButton();
+        radioButton_integral = new JRadioButton();
+        radioButton_eps = new JRadioButton();
+        radioButton_count = new JRadioButton();
+        radioButton_original = new JRadioButton();
 
         //======== this ========
         setResizable(false);
@@ -143,16 +181,10 @@ public class MainForm extends JFrame {
         txtFld_expression.setText("sin(1/x)");
 
         //---- label2 ----
-        label2.setText("min");
+        label2.setText("from");
 
         //---- label3 ----
-        label3.setText("max");
-
-        //---- label4 ----
-        label4.setText("eps");
-
-        //---- lbl_count ----
-        lbl_count.setText("count");
+        label3.setText("to");
 
         //---- btn_calculate ----
         btn_calculate.setText("Calculate!");
@@ -167,105 +199,119 @@ public class MainForm extends JFrame {
         spinner_max.addChangeListener(e -> spinner_maxStateChanged(e));
 
         //---- spinner_eps ----
-        spinner_eps.setModel(new SpinnerNumberModel(0.001, null, null, 0.001));
+        spinner_eps.setModel(new SpinnerNumberModel(0.001, 0.0, null, 0.001));
         spinner_eps.addChangeListener(e -> spinner_epsStateChanged(e));
 
         //---- spinner_count ----
         spinner_count.setModel(new SpinnerNumberModel(2000, 1, null, 1));
+        spinner_count.setEnabled(false);
         spinner_count.addChangeListener(e -> spinner_countStateChanged(e));
 
-        //======== panel1 ========
-        {
-            panel1.setBorder(new EtchedBorder());
+        //---- radioButton_derivate ----
+        radioButton_derivate.setText("take the derivate of f(x)");
 
-            //---- checkBox_diff ----
-            checkBox_diff.setText("f'(x)");
+        //---- radioButton_integral ----
+        radioButton_integral.setText("integrate f(x)");
 
-            GroupLayout panel1Layout = new GroupLayout(panel1);
-            panel1.setLayout(panel1Layout);
-            panel1Layout.setHorizontalGroup(
-                panel1Layout.createParallelGroup()
-                    .addGroup(panel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(checkBox_diff)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-            panel1Layout.setVerticalGroup(
-                panel1Layout.createParallelGroup()
-                    .addGroup(panel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(checkBox_diff)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-        }
+        //---- radioButton_eps ----
+        radioButton_eps.setText("eps");
+        radioButton_eps.setSelected(true);
+        radioButton_eps.addActionListener(e -> radioButton_Clicked(e));
+
+        //---- radioButton_count ----
+        radioButton_count.setText("count");
+        radioButton_count.addActionListener(e -> radioButton_Clicked(e));
+
+        //---- radioButton_original ----
+        radioButton_original.setText("draw graph of f(x)");
+        radioButton_original.setSelected(true);
 
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addComponent(separator1, GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
-                .addComponent(separator2, GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
-                .addComponent(separator3, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
+                contentPaneLayout.createParallelGroup()
+                        .addComponent(separator1)
+                        .addComponent(separator2)
                         .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(label1)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtFld_expression, GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(label2)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(spinner_min, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(label3)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(spinner_max, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(label4)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(spinner_eps, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
-                            .addComponent(lbl_count)
-                            .addGap(18, 18, 18)
-                            .addComponent(spinner_count, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(panel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGap(0, 661, Short.MAX_VALUE))
-                        .addComponent(btn_calculate, GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE))
-                    .addContainerGap())
+                                .addContainerGap()
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(label1)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtFld_expression))
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(label2)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(spinner_min, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(label3)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(spinner_max, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
+                                                .addComponent(radioButton_eps)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(spinner_eps, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(radioButton_count)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(spinner_count, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(radioButton_original)
+                                                .addGap(167, 167, 167)
+                                                .addComponent(radioButton_derivate)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+                                                .addComponent(radioButton_integral)))
+                                .addContainerGap())
+                        .addComponent(separator3)
+                        .addComponent(btn_calculate, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+        contentPaneLayout.linkSize(SwingConstants.HORIZONTAL, spinner_count, spinner_eps, spinner_max, spinner_min);
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(label1)
-                        .addComponent(txtFld_expression, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(separator1, GroupLayout.PREFERRED_SIZE, 3, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(label2)
-                        .addComponent(spinner_min, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(label3)
-                        .addComponent(spinner_max, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(label4)
-                        .addComponent(lbl_count)
-                        .addComponent(spinner_count, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(spinner_eps, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(separator2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(panel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(separator3, GroupLayout.PREFERRED_SIZE, 3, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btn_calculate)
-                    .addContainerGap(4, Short.MAX_VALUE))
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(label1)
+                                        .addComponent(txtFld_expression, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(separator1, GroupLayout.PREFERRED_SIZE, 3, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(label2)
+                                        .addComponent(label3)
+                                        .addComponent(spinner_max, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(spinner_count, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(radioButton_count)
+                                        .addComponent(spinner_min, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(spinner_eps, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(radioButton_eps))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(separator2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(radioButton_original)
+                                                .addComponent(radioButton_derivate))
+                                        .addComponent(radioButton_integral))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(separator3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_calculate)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pack();
         setLocationRelativeTo(getOwner());
+
+        //---- buttonGroup1 ----
+        var buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(radioButton_derivate);
+        buttonGroup1.add(radioButton_integral);
+        buttonGroup1.add(radioButton_original);
+
+        //---- buttonGroup ----
+        var buttonGroup = new ButtonGroup();
+        buttonGroup.add(radioButton_eps);
+        buttonGroup.add(radioButton_count);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -276,8 +322,6 @@ public class MainForm extends JFrame {
     private JSeparator separator1;
     private JLabel label2;
     private JLabel label3;
-    private JLabel label4;
-    private JLabel lbl_count;
     private JSeparator separator2;
     private JButton btn_calculate;
     private JSpinner spinner_min;
@@ -285,7 +329,10 @@ public class MainForm extends JFrame {
     private JSpinner spinner_eps;
     private JSpinner spinner_count;
     private JSeparator separator3;
-    private JPanel panel1;
-    private JCheckBox checkBox_diff;
+    private JRadioButton radioButton_derivate;
+    private JRadioButton radioButton_integral;
+    private JRadioButton radioButton_eps;
+    private JRadioButton radioButton_count;
+    private JRadioButton radioButton_original;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

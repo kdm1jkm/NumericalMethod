@@ -18,6 +18,10 @@ public class ErrorDialog extends JDialog {
         initComponents();
     }
 
+    public void setContent(String content){
+        textArea_content.setText(content);
+    }
+
     private void okButtonActionPerformed(ActionEvent e) {
         this.setVisible(false);
     }
@@ -28,6 +32,8 @@ public class ErrorDialog extends JDialog {
         dialogPane = new JPanel();
         contentPanel = new JPanel();
         label1 = new JLabel();
+        scrollPane1 = new JScrollPane();
+        textArea_content = new JTextArea();
         buttonBar = new JPanel();
         okButton = new JButton();
 
@@ -46,23 +52,38 @@ public class ErrorDialog extends JDialog {
             {
 
                 //---- label1 ----
-                label1.setText("Wrong Input!");
+                label1.setText("ERROR!");
+
+                //======== scrollPane1 ========
+                {
+
+                    //---- textArea_content ----
+                    textArea_content.setEditable(false);
+                    textArea_content.setText("asdasd");
+                    scrollPane1.setViewportView(textArea_content);
+                }
 
                 GroupLayout contentPanelLayout = new GroupLayout(contentPanel);
                 contentPanel.setLayout(contentPanelLayout);
                 contentPanelLayout.setHorizontalGroup(
-                        contentPanelLayout.createParallelGroup()
+                    contentPanelLayout.createParallelGroup()
+                        .addGroup(contentPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(contentPanelLayout.createParallelGroup()
+                                .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
                                 .addGroup(contentPanelLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(label1)
-                                        .addContainerGap(107, Short.MAX_VALUE))
+                                    .addComponent(label1)
+                                    .addGap(0, 348, Short.MAX_VALUE)))
+                            .addContainerGap())
                 );
                 contentPanelLayout.setVerticalGroup(
-                        contentPanelLayout.createParallelGroup()
-                                .addGroup(contentPanelLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(label1)
-                                        .addContainerGap(54, Short.MAX_VALUE))
+                    contentPanelLayout.createParallelGroup()
+                        .addGroup(contentPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(label1)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addContainerGap())
                 );
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
@@ -71,15 +92,15 @@ public class ErrorDialog extends JDialog {
             {
                 buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
                 buttonBar.setLayout(new GridBagLayout());
-                ((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[]{0, 80};
-                ((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[]{1.0, 0.0};
+                ((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 80};
+                ((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0};
 
                 //---- okButton ----
                 okButton.setText("OK");
                 okButton.addActionListener(e -> okButtonActionPerformed(e));
                 buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
             }
             dialogPane.add(buttonBar, BorderLayout.SOUTH);
         }
@@ -94,6 +115,8 @@ public class ErrorDialog extends JDialog {
     private JPanel dialogPane;
     private JPanel contentPanel;
     private JLabel label1;
+    private JScrollPane scrollPane1;
+    private JTextArea textArea_content;
     private JPanel buttonBar;
     private JButton okButton;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
