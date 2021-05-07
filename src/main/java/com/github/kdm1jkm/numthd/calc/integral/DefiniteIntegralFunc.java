@@ -1,4 +1,4 @@
-package com.github.kdm1jkm.numthd.calc;
+package com.github.kdm1jkm.numthd.calc.integral;
 
 import javax.swing.*;
 
