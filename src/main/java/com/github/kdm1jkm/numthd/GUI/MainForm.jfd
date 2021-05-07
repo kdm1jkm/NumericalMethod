@@ -4,14 +4,14 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {comp separator1::l:::x, comp separator2::l:::x, seq {space :p::p, par l {seq l {comp label1:::p::p, space :::p, comp txtFld_expression:::::x}, seq l {comp label2:::p::p, space :::p, comp spinner_min:1::p:114:p, space :::p, comp label3:::p::p, space :::p, comp spinner_max:1::p::p, space ::97:x, comp radioButton_eps:::p::p, space :::p, comp spinner_eps:1::p:112:p, space :::p, comp radioButton_count:::p::p, space :::p, comp spinner_count:1::p:113:p}, seq l {comp radioButton_original:::p::p, space :p:167:p, comp radioButton_derivate:::p::p, space ::199:x, comp radioButton_integral:::p::p}}, space :p::p}, comp separator3::l:::x, comp btn_calculate::t:::x}"
-			"$verticalGroup": "par l {seq l {space :p::p, par b {comp label1::b:p::p, comp txtFld_expression::b:p::p}, space :p::p, comp separator1:::p:3:p, space :p::p, par b {comp label2::b:p::p, comp label3::b:p::p, comp spinner_max::b:p::p, comp spinner_count::b:p::p, comp radioButton_count::b:p::p, comp spinner_min::b:p::p, comp spinner_eps::b:p::p, comp radioButton_eps::b:p::p}, space :::p, comp separator2:::p::p, space :::p, par l {par b {comp radioButton_original::b:p::p, comp radioButton_derivate::b:p::p}, comp radioButton_integral::l:p::p}, space :::p, comp separator3:::p::p, space :::p, comp btn_calculate:::p::p, space :::x}}"
+			"$horizontalGroup": "par l {comp separator1::l:::x, comp separator2::l:::x, comp separator3::l:::x, seq {space :::p, par l {seq l {comp label1:::p::p, space :::p, comp txtFld_expression:::::x}, seq l {comp spinner_min:1::p:114:p, space :::p, comp label2:::p::p, space :::p, comp spinner_max:1::p::p, space :::p, comp label3:::p::p, space ::87:x, comp radioButton_eps:::p::p, space :::p, comp spinner_eps:1::p:112:p, space :::p, comp radioButton_count:::p::p, space :::p, comp spinner_count:1::p:113:p}, seq l {comp radioButton_original:::p::p, space u:::p, comp radioButton_derivate:::p::p, space u:::p, comp radioButton_integral:::p::p, space u:::p, comp radioButton_root:::p::p, space u:::p, comp radioButton_extremeValue:::p::p, space :0:137:x}, comp btn_calculate::l:::x}, space :::p}}"
+			"$verticalGroup": "par l {seq l {space :p::p, par b {comp label1::b:p::p, comp txtFld_expression::b:p::p}, space :p::p, comp separator1:::p:3:p, space :p::p, par b {comp spinner_count::b:p::p, comp radioButton_count::b:p::p, comp spinner_eps::b:p::p, comp radioButton_eps::b:p::p, comp spinner_min::b:p::p, comp label2::b:p::p, comp spinner_max::b:p::p, comp label3::b:p::p}, space :::p, comp separator2:::p::p, space :::p, par b {comp radioButton_original::b:p::p, comp radioButton_derivate::b:p::p, comp radioButton_integral::b:p::p, comp radioButton_root::b:p::p, comp radioButton_extremeValue::b:p::p}, space :::p, comp separator3:::p::p, space :::p, comp btn_calculate:::p::p, space :::x}}"
 		} ) {
 			name: "this"
 			"resizable": false
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "label1"
-				"text": "Expression"
+				"text": "f(x)="
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtFld_expression"
@@ -22,18 +22,18 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "label2"
-				"text": "from"
+				"text": "에서"
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "label3"
-				"text": "to"
+				"text": "까지"
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
 				name: "separator2"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "btn_calculate"
-				"text": "Calculate!"
+				"text": "계산"
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btn_calculate_clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
@@ -63,10 +63,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
 				name: "spinner_count"
-				"model": new javax.swing.SpinnerNumberModel {
-					minimum: 1
-					value: 2000
-				}
+				"model": new javax.swing.SpinnerNumberModel( 2000, 1, 999999, 1 )
 				"enabled": false
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_countStateChanged", true ) )
 			} )
@@ -75,32 +72,42 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_derivate"
-				"text": "take the derivate of f(x)"
+				"text": "f'(x)의 그래프 그리기"
 				"$buttonGroup": new FormReference( "buttonGroup1" )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_integral"
-				"text": "integrate f(x)"
+				"text": "f(x) 정적분하기"
 				"$buttonGroup": new FormReference( "buttonGroup1" )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_eps"
-				"text": "eps"
+				"text": "간격"
 				"$buttonGroup": new FormReference( "buttonGroup" )
 				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_count"
-				"text": "count"
+				"text": "갯수"
 				"$buttonGroup": new FormReference( "buttonGroup" )
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_original"
-				"text": "draw graph of f(x)"
+				"text": "f(x)의 그래프 그리기"
 				"$buttonGroup": new FormReference( "buttonGroup1" )
 				"selected": true
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "radioButton_root"
+				"text": "해 구하기"
+				"$buttonGroup": &FormReference0 new FormReference( "buttonGroup1" )
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "radioButton_extremeValue"
+				"text": "극값 구하기"
+				"$buttonGroup": #FormReference0
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
@@ -114,7 +121,7 @@ new FormModel {
 		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
 			name: "buttonGroup1"
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 0, 260 )
+			"location": new java.awt.Point( 90, 210 )
 		} )
 	}
 }
