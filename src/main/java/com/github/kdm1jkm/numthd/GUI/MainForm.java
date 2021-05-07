@@ -6,9 +6,7 @@ package com.github.kdm1jkm.numthd.GUI;
 
 import com.github.kdm1jkm.numthd.DrawableGraph;
 import com.github.kdm1jkm.numthd.Main;
-import com.github.kdm1jkm.numthd.calc.DiffFunc;
-import com.github.kdm1jkm.numthd.calc.IdentityFunc;
-import com.github.kdm1jkm.numthd.calc.NormalFunc;
+import com.github.kdm1jkm.numthd.calc.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -109,7 +107,28 @@ public class MainForm extends JFrame {
                 }
                 Main.drawGraph(new DrawableGraph(xs, diffs, 0, 0, getCount(), "f'(x)"));
             } else if (radioButton_integral.isSelected()) {
-                // TODO
+                LoadingForm loadingForm = new LoadingForm(4);
+
+                loadingForm.setValue(1);
+                double[] xs = new IdentityFunc(getMin(),getMax(),getEps()).calculate(loadingForm.progressBar);
+                loadingForm.setValue(2);
+                double[] values = new NormalFunc(xs,getExpression()).calculate(loadingForm.progressBar);
+
+                loadingForm.setValue(3);
+                double result1 = new TrapezoidalRule(values, getEps()).calculate(loadingForm.progressBar);
+                loadingForm.setValue(4);
+                double result2 = new SimpsonRule(values, getEps()).calculate(loadingForm.progressBar);
+                loadingForm.setVisible(false);
+
+                if (Double.isNaN(result1) || Double.isNaN(result2)) {
+                    ErrorDialog errorDialog = new ErrorDialog(this);
+                    errorDialog.setContent(String.format("Can't integrate %s from %s to %s",getExpression(),getMin(),getMax()));
+                    errorDialog.setVisible(true);
+                    return;
+                }
+
+                IntegralResultForm form = new IntegralResultForm(getExpression(),getMin(),getMax(), result1, result2);
+                form.setVisible(true);
             }
         }).start();
     }
