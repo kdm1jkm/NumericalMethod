@@ -10,8 +10,8 @@ import com.github.kdm1jkm.numthd.Main;
 import com.github.kdm1jkm.numthd.calc.func.DiffFunc;
 import com.github.kdm1jkm.numthd.calc.func.IdentityFunc;
 import com.github.kdm1jkm.numthd.calc.func.NormalFunc;
-import com.github.kdm1jkm.numthd.calc.integral.SimpsonRule;
-import com.github.kdm1jkm.numthd.calc.integral.TrapezoidalRule;
+import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.SimpsonRule;
+import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.TrapezoidalRule;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
