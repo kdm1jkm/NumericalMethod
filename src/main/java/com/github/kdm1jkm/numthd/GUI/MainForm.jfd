@@ -56,15 +56,15 @@ new FormModel {
 				name: "spinner_eps"
 				"model": new javax.swing.SpinnerNumberModel {
 					minimum: 0.0
-					stepSize: 0.001
+					stepSize: 1.0E-5
 					value: 0.001
 				}
+				"enabled": false
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_epsStateChanged", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
 				name: "spinner_count"
-				"model": new javax.swing.SpinnerNumberModel( 2000, 1, 999999, 1 )
-				"enabled": false
+				"model": new javax.swing.SpinnerNumberModel( 100000, 1, 999999, 1 )
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_countStateChanged", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
@@ -84,13 +84,13 @@ new FormModel {
 				name: "radioButton_eps"
 				"text": "간격"
 				"$buttonGroup": new FormReference( "buttonGroup" )
-				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
 				name: "radioButton_count"
 				"text": "갯수"
 				"$buttonGroup": new FormReference( "buttonGroup" )
+				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {

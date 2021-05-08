@@ -237,12 +237,12 @@ public class MainForm extends JFrame {
         spinner_max.addChangeListener(e -> spinner_maxStateChanged(e));
 
         //---- spinner_eps ----
-        spinner_eps.setModel(new SpinnerNumberModel(0.001, 0.0, null, 0.001));
+        spinner_eps.setModel(new SpinnerNumberModel(0.001, 0.0, null, 1.0E-5));
+        spinner_eps.setEnabled(false);
         spinner_eps.addChangeListener(e -> spinner_epsStateChanged(e));
 
         //---- spinner_count ----
-        spinner_count.setModel(new SpinnerNumberModel(2000, 1, 999999, 1));
-        spinner_count.setEnabled(false);
+        spinner_count.setModel(new SpinnerNumberModel(100000, 1, 999999, 1));
         spinner_count.addChangeListener(e -> spinner_countStateChanged(e));
 
         //---- radioButton_derivate ----
@@ -253,11 +253,11 @@ public class MainForm extends JFrame {
 
         //---- radioButton_eps ----
         radioButton_eps.setText("\uac04\uaca9");
-        radioButton_eps.setSelected(true);
         radioButton_eps.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_count ----
         radioButton_count.setText("\uac2f\uc218");
+        radioButton_count.setSelected(true);
         radioButton_count.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_original ----
