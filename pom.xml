@@ -15,10 +15,15 @@
 
     <dependencies>
         <!-- 식 파싱 -->
+<!--        <dependency>-->
+<!--            <groupId>com.fathzer</groupId>-->
+<!--            <artifactId>javaluator</artifactId>-->
+<!--            <version>3.0.3</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>com.fathzer</groupId>
-            <artifactId>javaluator</artifactId>
-            <version>3.0.3</version>
+            <groupId>org.mariuszgromada.math</groupId>
+            <artifactId>MathParser.org-mXparser</artifactId>
+            <version>4.4.2</version>
         </dependency>
 
         <!-- 그래프 -->
