@@ -2,7 +2,7 @@ package com.github.kdm1jkm.numthd.calc.integral;
 
 import javax.swing.*;
 
-public class TrapezoidalRule implements DefiniteIntegralFunc {
+public class TrapezoidalRule implements FuncAnalyzer {
     private final double[] values;
     private final double delta;
 

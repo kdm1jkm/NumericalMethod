@@ -2,6 +2,6 @@ package com.github.kdm1jkm.numthd.calc.integral;
 
 import javax.swing.*;
 
-public interface DefiniteIntegralFunc {
+public interface FuncAnalyzer {
     double calculate(JProgressBar progressBar);
 }

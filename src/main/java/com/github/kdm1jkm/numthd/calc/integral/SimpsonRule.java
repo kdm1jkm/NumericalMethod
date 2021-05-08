@@ -2,7 +2,7 @@ package com.github.kdm1jkm.numthd.calc.integral;
 
 import javax.swing.*;
 
-public class SimpsonRule implements DefiniteIntegralFunc {
+public class SimpsonRule implements FuncAnalyzer {
     private final double[] values;
     private final double delta;
 
