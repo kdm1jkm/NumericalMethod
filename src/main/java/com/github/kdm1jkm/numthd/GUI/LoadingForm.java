@@ -10,15 +10,27 @@ import javax.swing.*;
  * @author dm k
  */
 public class LoadingForm extends JDialog {
-    final int max;
+    private int max;
+    private int value;
 
     public LoadingForm(int max) {
         this.max = max;
+        this.value = 0;
         initComponents();
-        setValue(0);
+        updateLabel();
     }
 
     public void setValue(int value) {
+        this.value = value;
+        updateLabel();
+    }
+
+    public void setMax(int value) {
+        max = value;
+        updateLabel();
+    }
+
+    public void updateLabel() {
         label1.setText(String.format("Generating... (%d/%d)", value, max));
     }
 

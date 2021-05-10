@@ -4,7 +4,6 @@
 
 package com.github.kdm1jkm.numthd.GUI;
 
-import java.awt.Component;
 import com.github.kdm1jkm.numthd.DrawableGraph;
 import com.github.kdm1jkm.numthd.Main;
 import com.github.kdm1jkm.numthd.calc.func.DiffFunc;
@@ -12,11 +11,14 @@ import com.github.kdm1jkm.numthd.calc.func.IdentityFunc;
 import com.github.kdm1jkm.numthd.calc.func.NormalFunc;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.SimpsonRule;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.TrapezoidalRule;
+import com.github.kdm1jkm.numthd.calc.funcAnalyer.rootFinder.NewtonRaphsonMethod;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author unknown
@@ -25,6 +27,7 @@ public class MainForm extends JFrame {
     public MainForm() {
         initComponents();
         update();
+        radioButton_Clicked(null);
     }
 
     private double getEps() {
@@ -47,6 +50,10 @@ public class MainForm extends JFrame {
         return (double) spinner_min.getValue();
     }
 
+    private int getIteration() {
+        return (int) spinner_iteration.getValue();
+    }
+
     private int getCount() {
         if (radioButton_count.isSelected()) {
             return (int) spinner_count.getValue();
@@ -63,6 +70,34 @@ public class MainForm extends JFrame {
                 calcDerivative();
             } else if (radioButton_integral.isSelected()) {
                 calcIntegral();
+            } else if (radioButton_root.isSelected()) {
+                LoadingForm loadingForm = new LoadingForm(0);
+                loadingForm.setVisible(true);
+
+                double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
+                double[] values = new NormalFunc(xs, getExpression()).calculate(loadingForm.progressBar);
+                List<Double> initXs = new ArrayList<>();
+                for (int i = 0; i < values.length - 1; i++) {
+                    if (values[i] * values[i + 1] < 0 || (i != 0 && values[i] == 0 && values[i - 1] * values[i + 1] < 0)) {
+                        initXs.add(xs[i]);
+                    }
+                }
+
+                loadingForm.setMax(initXs.size());
+
+                Map<Double, Double> roots = new HashMap<>(initXs.size());
+                for (int i = 0; i < initXs.size(); i++) {
+                    Double initX = initXs.get(i);
+                    loadingForm.setValue(i + 1);
+                    roots.put(initX, new NewtonRaphsonMethod(initX, getExpression(), getIteration()).calculate(loadingForm.progressBar));
+                }
+
+                loadingForm.setVisible(false);
+
+                ResultForm resultForm = new ResultForm("Roots");
+                resultForm.setContent("");
+                roots.forEach((a, b) -> resultForm.addContentLn(String.format("f(%.15f)=%.15f", a, b)));
+                resultForm.setVisible(true);
             }
         }).start();
     }
@@ -89,7 +124,7 @@ public class MainForm extends JFrame {
 
             loading.setVisible(false);
         }
-        Main.drawGraph(new DrawableGraph(xs, values, 0, 0, getCount(), "f(x)"));
+        Main.drawGraph(new DrawableGraph(xs, values, xs.length, "f(x)"));
     }
 
     private void calcDerivative() {
@@ -122,16 +157,16 @@ public class MainForm extends JFrame {
         } finally {
             loading.setVisible(false);
         }
-        Main.drawGraph(new DrawableGraph(xs, diffs, 0, 0, getCount(), "f'(x)"));
+        Main.drawGraph(new DrawableGraph(xs, diffs, xs.length, "f'(x)"));
     }
 
     private void calcIntegral() {
         LoadingForm loadingForm = new LoadingForm(4);
 
         loadingForm.setValue(1);
-        double[] xs = new IdentityFunc(getMin(),getMax(),getEps()).calculate(loadingForm.progressBar);
+        double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
         loadingForm.setValue(2);
-        double[] values = new NormalFunc(xs,getExpression()).calculate(loadingForm.progressBar);
+        double[] values = new NormalFunc(xs, getExpression()).calculate(loadingForm.progressBar);
 
         loadingForm.setValue(3);
         double result1 = new TrapezoidalRule(values, getEps()).calculate(loadingForm.progressBar);
@@ -141,12 +176,15 @@ public class MainForm extends JFrame {
 
         if (Double.isNaN(result1) || Double.isNaN(result2)) {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.setContent(String.format("Can't integrate %s from %s to %s",getExpression(),getMin(),getMax()));
+            errorDialog.setContent(String.format("Can't integrate %s from %s to %s", getExpression(), getMin(), getMax()));
             errorDialog.setVisible(true);
             return;
         }
 
-        IntegralResultForm form = new IntegralResultForm(getExpression(),getMin(),getMax(), result1, result2);
+        ResultForm form = new ResultForm("Integral Result");
+        form.addContentLn(String.format("Integrate %s from %g to %g", getExpression(), getMin(), getMax()));
+        form.addContentLn(String.format("The Trapezoidal Rule: %g", result1));
+        form.addContentLn(String.format("Simpson's Rule: %g", result2));
         form.setVisible(true);
     }
 
@@ -183,6 +221,8 @@ public class MainForm extends JFrame {
     private void radioButton_Clicked(ActionEvent e) {
         spinner_eps.setEnabled(radioButton_eps.isSelected());
         spinner_count.setEnabled(radioButton_count.isSelected());
+
+        spinner_iteration.setEnabled(radioButton_root.isSelected() || radioButton_extremeValue.isSelected());
     }
 
     private void initComponents() {
@@ -207,6 +247,8 @@ public class MainForm extends JFrame {
         radioButton_original = new JRadioButton();
         radioButton_root = new JRadioButton();
         radioButton_extremeValue = new JRadioButton();
+        spinner_iteration = new JSpinner();
+        label4 = new JLabel();
 
         //======== this ========
         setResizable(false);
@@ -216,7 +258,7 @@ public class MainForm extends JFrame {
         label1.setText("f(x)=");
 
         //---- txtFld_expression ----
-        txtFld_expression.setText("sin(1/x)");
+        txtFld_expression.setText("sin(x*pi)");
 
         //---- label2 ----
         label2.setText("\uc5d0\uc11c");
@@ -229,11 +271,11 @@ public class MainForm extends JFrame {
         btn_calculate.addActionListener(e -> btn_calculate_clicked(e));
 
         //---- spinner_min ----
-        spinner_min.setModel(new SpinnerNumberModel(-10.0, null, null, 1.0));
+        spinner_min.setModel(new SpinnerNumberModel(0.0, null, null, 1.0));
         spinner_min.addChangeListener(e -> spinner_minStateChanged(e));
 
         //---- spinner_max ----
-        spinner_max.setModel(new SpinnerNumberModel(10.0, null, null, 1.0));
+        spinner_max.setModel(new SpinnerNumberModel(2.0, null, null, 1.0));
         spinner_max.addChangeListener(e -> spinner_maxStateChanged(e));
 
         //---- spinner_eps ----
@@ -247,9 +289,11 @@ public class MainForm extends JFrame {
 
         //---- radioButton_derivate ----
         radioButton_derivate.setText("f'(x)\uc758 \uadf8\ub798\ud504 \uadf8\ub9ac\uae30");
+        radioButton_derivate.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_integral ----
         radioButton_integral.setText("f(x) \uc815\uc801\ubd84\ud558\uae30");
+        radioButton_integral.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_eps ----
         radioButton_eps.setText("\uac04\uaca9");
@@ -263,12 +307,21 @@ public class MainForm extends JFrame {
         //---- radioButton_original ----
         radioButton_original.setText("f(x)\uc758 \uadf8\ub798\ud504 \uadf8\ub9ac\uae30");
         radioButton_original.setSelected(true);
+        radioButton_original.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_root ----
         radioButton_root.setText("\ud574 \uad6c\ud558\uae30");
+        radioButton_root.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_extremeValue ----
         radioButton_extremeValue.setText("\uadf9\uac12 \uad6c\ud558\uae30");
+        radioButton_extremeValue.addActionListener(e -> radioButton_Clicked(e));
+
+        //---- spinner_iteration ----
+        spinner_iteration.setModel(new SpinnerNumberModel(100, 1, null, 1));
+
+        //---- label4 ----
+        label4.setText("\ubc18\ubcf5");
 
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
@@ -310,7 +363,10 @@ public class MainForm extends JFrame {
                             .addComponent(radioButton_root)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                             .addComponent(radioButton_extremeValue)
-                            .addGap(0, 137, Short.MAX_VALUE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                            .addComponent(label4)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(spinner_iteration, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE))
                         .addComponent(btn_calculate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addContainerGap())
         );
@@ -342,12 +398,14 @@ public class MainForm extends JFrame {
                         .addComponent(radioButton_derivate)
                         .addComponent(radioButton_integral)
                         .addComponent(radioButton_root)
-                        .addComponent(radioButton_extremeValue))
+                        .addComponent(radioButton_extremeValue)
+                        .addComponent(spinner_iteration, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(label4))
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(separator3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(btn_calculate)
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addContainerGap(8, Short.MAX_VALUE))
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -388,5 +446,7 @@ public class MainForm extends JFrame {
     private JRadioButton radioButton_original;
     private JRadioButton radioButton_root;
     private JRadioButton radioButton_extremeValue;
+    private JSpinner spinner_iteration;
+    private JLabel label4;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
