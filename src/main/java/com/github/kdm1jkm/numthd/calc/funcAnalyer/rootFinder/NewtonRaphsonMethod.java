@@ -6,7 +6,7 @@ import org.mariuszgromada.math.mxparser.Expression;
 
 import javax.swing.*;
 
-public class NewtonRaphsonMethod implements FuncAnalyzer {
+public class NewtonRaphsonMethod implements RootFinder {
     private final String expression;
     private final int iteration;
     private final double initX;

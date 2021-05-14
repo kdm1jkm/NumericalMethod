@@ -12,6 +12,7 @@ import com.github.kdm1jkm.numthd.calc.func.NormalFunc;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.SimpsonRule;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.TrapezoidalRule;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.rootFinder.NewtonRaphsonMethod;
+import com.github.kdm1jkm.numthd.calc.funcAnalyer.rootFinder.RootFinder;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -83,20 +84,35 @@ public class MainForm extends JFrame {
                     }
                 }
 
-                loadingForm.setMax(initXs.size());
+                List<Class<? extends RootFinder>> rootFinderClasses = Collections.singletonList(NewtonRaphsonMethod.class);
 
-                Map<Double, Double> roots = new HashMap<>(initXs.size());
-                for (int i = 0; i < initXs.size(); i++) {
-                    Double initX = initXs.get(i);
-                    loadingForm.setValue(i + 1);
-                    roots.put(initX, new NewtonRaphsonMethod(initX, getExpression(), getIteration()).calculate(loadingForm.progressBar));
+                loadingForm.setMax(initXs.size() * rootFinderClasses.size());
+                loadingForm.setValue(1);
+
+                ResultForm resultForm = new ResultForm("Roots");
+                resultForm.setContent("");
+
+                for (Class<? extends RootFinder> rootFinderClass : rootFinderClasses) {
+                    Map<Double, Double> roots = new HashMap<>(initXs.size());
+                    for (int i = 0; i < initXs.size(); i++) {
+                        Double initX = initXs.get(i);
+                        loadingForm.setValue(i + 1);
+                        RootFinder finder = null;
+                        try {
+                            finder = rootFinderClass.getConstructor(double.class, String.class, int.class).newInstance(initX, getExpression(), getIteration());
+                        } catch (Exception exception) {
+
+                        }
+                        roots.put(initX, finder.calculate(loadingForm.progressBar));
+                        loadingForm.next();
+                    }
+                    resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
+                    roots.forEach((a, b) -> resultForm.addContentLn(String.format("f(%.15f)=%.15f", a, b)));
+                    resultForm.addContent("\n\n");
                 }
 
                 loadingForm.setVisible(false);
 
-                ResultForm resultForm = new ResultForm("Roots");
-                resultForm.setContent("");
-                roots.forEach((a, b) -> resultForm.addContentLn(String.format("f(%.15f)=%.15f", a, b)));
                 resultForm.setVisible(true);
             }
         }).start();

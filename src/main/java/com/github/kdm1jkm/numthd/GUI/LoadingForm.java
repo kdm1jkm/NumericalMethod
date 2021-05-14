@@ -34,6 +34,10 @@ public class LoadingForm extends JDialog {
         label1.setText(String.format("Generating... (%d/%d)", value, max));
     }
 
+    public void next(){
+        setValue(++value);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner non-commercial license
