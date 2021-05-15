@@ -13,6 +13,8 @@ import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.SimpsonRule;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.integral.TrapezoidalRule;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.rootFinder.NewtonRaphsonMethod;
 import com.github.kdm1jkm.numthd.calc.funcAnalyer.rootFinder.RootFinder;
+import org.mariuszgromada.math.mxparser.Argument;
+import org.mariuszgromada.math.mxparser.Expression;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -73,19 +75,24 @@ public class MainForm extends JFrame {
             } else if (radioButton_integral.isSelected()) {
                 calcIntegral();
             } else if (radioButton_root.isSelected()) {
-                calcRoots();
+                calcRoots(getExpression());
             } else if (radioButton_extremeValue.isSelected()) {
+                calcRoots(String.format("der(%s, x)",getExpression()),getExpression());
 
             }
         }).start();
     }
 
-    private void calcRoots() {
+    private void calcRoots(String expression) {
+        calcRoots(expression, expression);
+    }
+
+    private void calcRoots(String expression, String originalExpression) {
         LoadingForm loadingForm = new LoadingForm(0);
         loadingForm.setVisible(true);
 
         double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
-        double[] values = new NormalFunc(xs, getExpression()).calculate(loadingForm.progressBar);
+        double[] values = new NormalFunc(xs, expression).calculate(loadingForm.progressBar);
         List<Double> initXs = new ArrayList<>();
         for (int i = 0; i < values.length - 1; i++) {
             if (values[i] * values[i + 1] < 0 || (i != 0 && values[i] == 0 && values[i - 1] * values[i + 1] < 0)) {
@@ -108,7 +115,7 @@ public class MainForm extends JFrame {
                 loadingForm.setValue(i + 1);
                 RootFinder finder = null;
                 try {
-                    finder = rootFinderClass.getConstructor(double.class, String.class, int.class).newInstance(initX, getExpression(), getIteration());
+                    finder = rootFinderClass.getConstructor(double.class, String.class, int.class).newInstance(initX, expression, getIteration());
                 } catch (Exception exception) {
 
                 }
@@ -116,10 +123,13 @@ public class MainForm extends JFrame {
                 loadingForm.next();
             }
             resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
+            Argument argument = new Argument("x");
+            Expression ex = new Expression(originalExpression,argument);
             roots.entrySet().stream()
                     .sorted(Comparator.comparingDouble(Map.Entry::getKey))
                     .forEach(entry -> {
-                        resultForm.addContentLn(String.format("f(%.15f)=%.15f", entry.getKey(), entry.getValue()));
+                        argument.setArgumentValue(entry.getKey());
+                        resultForm.addContentLn(String.format("f(%.15f)=%.15f", entry.getKey(), ex.calculate()));
                     });
             resultForm.addContent("\n\n");
         }
