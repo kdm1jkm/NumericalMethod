@@ -9,6 +9,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			"title": "Generation..."
+			"defaultCloseOperation": 0
 			add( new FormComponent( "javax.swing.JProgressBar" ) {
 				name: "progressBar"
 				auxiliary() {

@@ -64,6 +64,7 @@ public class MainForm extends JFrame {
     }
 
     private void btn_calculate_clicked(ActionEvent e) {
+        // Runnable을 loadingform으로 넘기던지 해야지
         new Thread(() -> {
             if (radioButton_original.isSelected()) {
                 calcFunc();
@@ -72,54 +73,60 @@ public class MainForm extends JFrame {
             } else if (radioButton_integral.isSelected()) {
                 calcIntegral();
             } else if (radioButton_root.isSelected()) {
-                LoadingForm loadingForm = new LoadingForm(0);
-                loadingForm.setVisible(true);
+                calcRoots();
+            } else if (radioButton_extremeValue.isSelected()) {
 
-                double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
-                double[] values = new NormalFunc(xs, getExpression()).calculate(loadingForm.progressBar);
-                List<Double> initXs = new ArrayList<>();
-                for (int i = 0; i < values.length - 1; i++) {
-                    if (values[i] * values[i + 1] < 0 || (i != 0 && values[i] == 0 && values[i - 1] * values[i + 1] < 0)) {
-                        initXs.add(xs[i]);
-                    }
-                }
-
-                List<Class<? extends RootFinder>> rootFinderClasses = Collections.singletonList(NewtonRaphsonMethod.class);
-
-                loadingForm.setMax(initXs.size() * rootFinderClasses.size());
-                loadingForm.setValue(1);
-
-                ResultForm resultForm = new ResultForm("Roots");
-                resultForm.setContent("");
-
-                for (Class<? extends RootFinder> rootFinderClass : rootFinderClasses) {
-                    Map<Double, Double> roots = new HashMap<>(initXs.size());
-                    for (int i = 0; i < initXs.size(); i++) {
-                        Double initX = initXs.get(i);
-                        loadingForm.setValue(i + 1);
-                        RootFinder finder = null;
-                        try {
-                            finder = rootFinderClass.getConstructor(double.class, String.class, int.class).newInstance(initX, getExpression(), getIteration());
-                        } catch (Exception exception) {
-
-                        }
-                        roots.put(initX, finder.calculate(loadingForm.progressBar));
-                        loadingForm.next();
-                    }
-                    resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
-                    roots.entrySet().stream()
-                            .sorted(Comparator.comparingDouble(Map.Entry::getKey))
-                            .forEach(entry -> {
-                                resultForm.addContentLn(String.format("f(%.15f)=%.15f", entry.getKey(), entry.getValue()));
-                            });
-                    resultForm.addContent("\n\n");
-                }
-
-                loadingForm.setVisible(false);
-
-                resultForm.setVisible(true);
             }
         }).start();
+    }
+
+    private void calcRoots() {
+        LoadingForm loadingForm = new LoadingForm(0);
+        loadingForm.setVisible(true);
+
+        double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
+        double[] values = new NormalFunc(xs, getExpression()).calculate(loadingForm.progressBar);
+        List<Double> initXs = new ArrayList<>();
+        for (int i = 0; i < values.length - 1; i++) {
+            if (values[i] * values[i + 1] < 0 || (i != 0 && values[i] == 0 && values[i - 1] * values[i + 1] < 0)) {
+                initXs.add(xs[i]);
+            }
+        }
+
+        List<Class<? extends RootFinder>> rootFinderClasses = Collections.singletonList(NewtonRaphsonMethod.class);
+
+        loadingForm.setMax(initXs.size() * rootFinderClasses.size());
+        loadingForm.setValue(1);
+
+        ResultForm resultForm = new ResultForm("Roots");
+        resultForm.setContent("");
+
+        for (Class<? extends RootFinder> rootFinderClass : rootFinderClasses) {
+            Map<Double, Double> roots = new HashMap<>(initXs.size());
+            for (int i = 0; i < initXs.size(); i++) {
+                Double initX = initXs.get(i);
+                loadingForm.setValue(i + 1);
+                RootFinder finder = null;
+                try {
+                    finder = rootFinderClass.getConstructor(double.class, String.class, int.class).newInstance(initX, getExpression(), getIteration());
+                } catch (Exception exception) {
+
+                }
+                roots.put(initX, finder.calculate(loadingForm.progressBar));
+                loadingForm.next();
+            }
+            resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
+            roots.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(Map.Entry::getKey))
+                    .forEach(entry -> {
+                        resultForm.addContentLn(String.format("f(%.15f)=%.15f", entry.getKey(), entry.getValue()));
+                    });
+            resultForm.addContent("\n\n");
+        }
+
+        loadingForm.setVisible(false);
+
+        resultForm.setVisible(true);
     }
 
     private void calcFunc() {
@@ -182,6 +189,7 @@ public class MainForm extends JFrame {
 
     private void calcIntegral() {
         LoadingForm loadingForm = new LoadingForm(4);
+        loadingForm.setVisible(true);
 
         loadingForm.setValue(1);
         double[] xs = new IdentityFunc(getMin(), getMax(), getEps()).calculate(loadingForm.progressBar);
@@ -272,6 +280,7 @@ public class MainForm extends JFrame {
 
         //======== this ========
         setResizable(false);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         var contentPane = getContentPane();
 
         //---- label1 ----
@@ -425,7 +434,7 @@ public class MainForm extends JFrame {
                     .addComponent(separator3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(btn_calculate)
-                    .addContainerGap(8, Short.MAX_VALUE))
+                    .addContainerGap(7, Short.MAX_VALUE))
         );
         pack();
         setLocationRelativeTo(getOwner());

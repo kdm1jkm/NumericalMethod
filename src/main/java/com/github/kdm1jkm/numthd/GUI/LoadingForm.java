@@ -46,6 +46,7 @@ public class LoadingForm extends JDialog {
 
         //======== this ========
         setTitle("Generation...");
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         var contentPane = getContentPane();
 
         //---- label1 ----
@@ -54,22 +55,22 @@ public class LoadingForm extends JDialog {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(label1)
-                                        .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(4, Short.MAX_VALUE))
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(label1)
+                        .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE))
+                    .addContainerGap(4, Short.MAX_VALUE))
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(label1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(9, Short.MAX_VALUE))
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(label1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(9, Short.MAX_VALUE))
         );
         pack();
         setLocationRelativeTo(getOwner());
