@@ -107,7 +107,11 @@ public class MainForm extends JFrame {
                         loadingForm.next();
                     }
                     resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
-                    roots.forEach((a, b) -> resultForm.addContentLn(String.format("f(%.15f)=%.15f", a, b)));
+                    roots.entrySet().stream()
+                            .sorted(Comparator.comparingDouble(Map.Entry::getKey))
+                            .forEach(entry -> {
+                                resultForm.addContentLn(String.format("f(%.15f)=%.15f", entry.getKey(), entry.getValue()));
+                            });
                     resultForm.addContent("\n\n");
                 }
 
