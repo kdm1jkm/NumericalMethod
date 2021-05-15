@@ -16,7 +16,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtFld_expression"
-				"text": "sin(x*pi)"
+				"text": "ln((((((e^x+1)*sin(x))^2 + abs(((e^x+1)*sin(x))-1)-((e^x+1)*sin(x))^3)^2+1)/(sin((tan(cos(sec(((e^x+1)*sin(x))))))^2)))+1)-10"
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
 				name: "separator1"
@@ -41,7 +41,7 @@ new FormModel {
 				name: "spinner_min"
 				"model": new javax.swing.SpinnerNumberModel {
 					stepSize: 1.0
-					value: 0.0
+					value: -800.0
 				}
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_minStateChanged", true ) )
 			} )
@@ -49,7 +49,7 @@ new FormModel {
 				name: "spinner_max"
 				"model": new javax.swing.SpinnerNumberModel {
 					stepSize: 1.0
-					value: 2.0
+					value: 800.0
 				}
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_maxStateChanged", true ) )
 			} )
@@ -65,7 +65,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
 				name: "spinner_count"
-				"model": new javax.swing.SpinnerNumberModel( 100000, 1, 999999, 1 )
+				"model": new javax.swing.SpinnerNumberModel( 10000, 1, 999999, 1 )
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_countStateChanged", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
@@ -119,7 +119,7 @@ new FormModel {
 				name: "spinner_iteration"
 				"model": new javax.swing.SpinnerNumberModel {
 					minimum: 1
-					value: 100
+					value: 10
 				}
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {

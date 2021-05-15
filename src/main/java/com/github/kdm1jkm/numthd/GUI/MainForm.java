@@ -297,7 +297,7 @@ public class MainForm extends JFrame {
         label1.setText("f(x)=");
 
         //---- txtFld_expression ----
-        txtFld_expression.setText("sin(x*pi)");
+        txtFld_expression.setText("ln((((((e^x+1)*sin(x))^2 + abs(((e^x+1)*sin(x))-1)-((e^x+1)*sin(x))^3)^2+1)/(sin((tan(cos(sec(((e^x+1)*sin(x))))))^2)))+1)-10");
 
         //---- label2 ----
         label2.setText("\uc5d0\uc11c");
@@ -310,11 +310,11 @@ public class MainForm extends JFrame {
         btn_calculate.addActionListener(e -> btn_calculate_clicked(e));
 
         //---- spinner_min ----
-        spinner_min.setModel(new SpinnerNumberModel(0.0, null, null, 1.0));
+        spinner_min.setModel(new SpinnerNumberModel(-800.0, null, null, 1.0));
         spinner_min.addChangeListener(e -> spinner_minStateChanged(e));
 
         //---- spinner_max ----
-        spinner_max.setModel(new SpinnerNumberModel(2.0, null, null, 1.0));
+        spinner_max.setModel(new SpinnerNumberModel(800.0, null, null, 1.0));
         spinner_max.addChangeListener(e -> spinner_maxStateChanged(e));
 
         //---- spinner_eps ----
@@ -323,7 +323,7 @@ public class MainForm extends JFrame {
         spinner_eps.addChangeListener(e -> spinner_epsStateChanged(e));
 
         //---- spinner_count ----
-        spinner_count.setModel(new SpinnerNumberModel(100000, 1, 999999, 1));
+        spinner_count.setModel(new SpinnerNumberModel(10000, 1, 999999, 1));
         spinner_count.addChangeListener(e -> spinner_countStateChanged(e));
 
         //---- radioButton_derivate ----
@@ -357,7 +357,7 @@ public class MainForm extends JFrame {
         radioButton_extremeValue.addActionListener(e -> radioButton_Clicked(e));
 
         //---- spinner_iteration ----
-        spinner_iteration.setModel(new SpinnerNumberModel(100, 1, null, 1));
+        spinner_iteration.setModel(new SpinnerNumberModel(10, 1, null, 1));
 
         //---- label4 ----
         label4.setText("\ubc18\ubcf5");
