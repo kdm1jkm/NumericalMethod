@@ -16,7 +16,7 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtFld_expression"
-				"text": "ln((((((e^x+1)*sin(x))^2 + abs(((e^x+1)*sin(x))-1)-((e^x+1)*sin(x))^3)^2+1)/(sin((tan(cos(sec(((e^x+1)*sin(x))))))^2)))+1)-10"
+				"text": "sin(x)"
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
 				name: "separator1"
@@ -41,7 +41,7 @@ new FormModel {
 				name: "spinner_min"
 				"model": new javax.swing.SpinnerNumberModel {
 					stepSize: 1.0
-					value: -800.0
+					value: 0.0
 				}
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_minStateChanged", true ) )
 			} )
@@ -49,7 +49,7 @@ new FormModel {
 				name: "spinner_max"
 				"model": new javax.swing.SpinnerNumberModel {
 					stepSize: 1.0
-					value: 800.0
+					value: 9.42477796077
 				}
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_maxStateChanged", true ) )
 			} )
@@ -65,22 +65,22 @@ new FormModel {
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
 				name: "spinner_count"
-				"model": new javax.swing.SpinnerNumberModel( 10000, 1, 999999, 1 )
+				"model": new javax.swing.SpinnerNumberModel( 100000, 1, 999999, 1 )
 				addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "spinner_countStateChanged", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSeparator" ) {
 				name: "separator3"
 			} )
-			add( new FormComponent( "javax.swing.JRadioButton" ) {
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
 				name: "radioButton_derivate"
 				"text": "f'(x)의 그래프 그리기"
-				"$buttonGroup": new FormReference( "buttonGroup1" )
+				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
-			add( new FormComponent( "javax.swing.JRadioButton" ) {
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
 				name: "radioButton_integral"
 				"text": "f(x) 정적분하기"
-				"$buttonGroup": new FormReference( "buttonGroup1" )
+				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JRadioButton" ) {
@@ -96,30 +96,29 @@ new FormModel {
 				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
-			add( new FormComponent( "javax.swing.JRadioButton" ) {
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
 				name: "radioButton_original"
 				"text": "f(x)의 그래프 그리기"
-				"$buttonGroup": new FormReference( "buttonGroup1" )
 				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
-			add( new FormComponent( "javax.swing.JRadioButton" ) {
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
 				name: "radioButton_root"
 				"text": "해 구하기"
-				"$buttonGroup": &FormReference0 new FormReference( "buttonGroup1" )
+				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
-			add( new FormComponent( "javax.swing.JRadioButton" ) {
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
 				name: "radioButton_extremeValue"
 				"text": "극값 구하기"
-				"$buttonGroup": #FormReference0
+				"selected": true
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "radioButton_Clicked", true ) )
 			} )
 			add( new FormComponent( "javax.swing.JSpinner" ) {
 				name: "spinner_iteration"
 				"model": new javax.swing.SpinnerNumberModel {
 					minimum: 1
-					value: 10
+					value: 100
 				}
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -134,11 +133,6 @@ new FormModel {
 			name: "buttonGroup"
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 360 )
-		} )
-		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
-			name: "buttonGroup1"
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 90, 360 )
 		} )
 	}
 }

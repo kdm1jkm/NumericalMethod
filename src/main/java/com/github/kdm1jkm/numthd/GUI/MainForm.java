@@ -67,20 +67,16 @@ public class MainForm extends JFrame {
 
     private void btn_calculate_clicked(ActionEvent e) {
         // Runnable을 loadingform으로 넘기던지 해야지
-        new Thread(() -> {
-            if (radioButton_original.isSelected()) {
-                calcFunc();
-            } else if (radioButton_derivate.isSelected()) {
-                calcDerivative();
-            } else if (radioButton_integral.isSelected()) {
-                calcIntegral();
-            } else if (radioButton_root.isSelected()) {
-                calcRoots(getExpression());
-            } else if (radioButton_extremeValue.isSelected()) {
-                calcRoots(String.format("der(%s, x)",getExpression()),getExpression());
-
-            }
-        }).start();
+        if (radioButton_original.isSelected())
+            new Thread(this::calcFunc).start();
+        if (radioButton_derivate.isSelected())
+            new Thread(this::calcDerivative).start();
+        if (radioButton_integral.isSelected())
+            new Thread(this::calcIntegral).start();
+        if (radioButton_root.isSelected())
+            new Thread(() -> calcRoots(getExpression())).start();
+        if (radioButton_extremeValue.isSelected())
+            new Thread(() -> calcRoots(String.format("der(%s, x)", getExpression()), getExpression())).start();
     }
 
     private void calcRoots(String expression) {
@@ -124,7 +120,7 @@ public class MainForm extends JFrame {
             }
             resultForm.addContentLn(String.format("------%s------", rootFinderClass.getSimpleName()));
             Argument argument = new Argument("x");
-            Expression ex = new Expression(originalExpression,argument);
+            Expression ex = new Expression(originalExpression, argument);
             roots.entrySet().stream()
                     .sorted(Comparator.comparingDouble(Map.Entry::getKey))
                     .forEach(entry -> {
@@ -278,13 +274,13 @@ public class MainForm extends JFrame {
         spinner_eps = new JSpinner();
         spinner_count = new JSpinner();
         separator3 = new JSeparator();
-        radioButton_derivate = new JRadioButton();
-        radioButton_integral = new JRadioButton();
+        radioButton_derivate = new JCheckBox();
+        radioButton_integral = new JCheckBox();
         radioButton_eps = new JRadioButton();
         radioButton_count = new JRadioButton();
-        radioButton_original = new JRadioButton();
-        radioButton_root = new JRadioButton();
-        radioButton_extremeValue = new JRadioButton();
+        radioButton_original = new JCheckBox();
+        radioButton_root = new JCheckBox();
+        radioButton_extremeValue = new JCheckBox();
         spinner_iteration = new JSpinner();
         label4 = new JLabel();
 
@@ -297,7 +293,7 @@ public class MainForm extends JFrame {
         label1.setText("f(x)=");
 
         //---- txtFld_expression ----
-        txtFld_expression.setText("ln((((((e^x+1)*sin(x))^2 + abs(((e^x+1)*sin(x))-1)-((e^x+1)*sin(x))^3)^2+1)/(sin((tan(cos(sec(((e^x+1)*sin(x))))))^2)))+1)-10");
+        txtFld_expression.setText("sin(x)");
 
         //---- label2 ----
         label2.setText("\uc5d0\uc11c");
@@ -310,11 +306,11 @@ public class MainForm extends JFrame {
         btn_calculate.addActionListener(e -> btn_calculate_clicked(e));
 
         //---- spinner_min ----
-        spinner_min.setModel(new SpinnerNumberModel(-800.0, null, null, 1.0));
+        spinner_min.setModel(new SpinnerNumberModel(0.0, null, null, 1.0));
         spinner_min.addChangeListener(e -> spinner_minStateChanged(e));
 
         //---- spinner_max ----
-        spinner_max.setModel(new SpinnerNumberModel(800.0, null, null, 1.0));
+        spinner_max.setModel(new SpinnerNumberModel(9.42477796077, null, null, 1.0));
         spinner_max.addChangeListener(e -> spinner_maxStateChanged(e));
 
         //---- spinner_eps ----
@@ -323,15 +319,17 @@ public class MainForm extends JFrame {
         spinner_eps.addChangeListener(e -> spinner_epsStateChanged(e));
 
         //---- spinner_count ----
-        spinner_count.setModel(new SpinnerNumberModel(10000, 1, 999999, 1));
+        spinner_count.setModel(new SpinnerNumberModel(100000, 1, 999999, 1));
         spinner_count.addChangeListener(e -> spinner_countStateChanged(e));
 
         //---- radioButton_derivate ----
         radioButton_derivate.setText("f'(x)\uc758 \uadf8\ub798\ud504 \uadf8\ub9ac\uae30");
+        radioButton_derivate.setSelected(true);
         radioButton_derivate.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_integral ----
         radioButton_integral.setText("f(x) \uc815\uc801\ubd84\ud558\uae30");
+        radioButton_integral.setSelected(true);
         radioButton_integral.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_eps ----
@@ -350,14 +348,16 @@ public class MainForm extends JFrame {
 
         //---- radioButton_root ----
         radioButton_root.setText("\ud574 \uad6c\ud558\uae30");
+        radioButton_root.setSelected(true);
         radioButton_root.addActionListener(e -> radioButton_Clicked(e));
 
         //---- radioButton_extremeValue ----
         radioButton_extremeValue.setText("\uadf9\uac12 \uad6c\ud558\uae30");
+        radioButton_extremeValue.setSelected(true);
         radioButton_extremeValue.addActionListener(e -> radioButton_Clicked(e));
 
         //---- spinner_iteration ----
-        spinner_iteration.setModel(new SpinnerNumberModel(10, 1, null, 1));
+        spinner_iteration.setModel(new SpinnerNumberModel(100, 1, null, 1));
 
         //---- label4 ----
         label4.setText("\ubc18\ubcf5");
@@ -449,14 +449,6 @@ public class MainForm extends JFrame {
         pack();
         setLocationRelativeTo(getOwner());
 
-        //---- buttonGroup1 ----
-        var buttonGroup1 = new ButtonGroup();
-        buttonGroup1.add(radioButton_derivate);
-        buttonGroup1.add(radioButton_integral);
-        buttonGroup1.add(radioButton_original);
-        buttonGroup1.add(radioButton_root);
-        buttonGroup1.add(radioButton_extremeValue);
-
         //---- buttonGroup ----
         var buttonGroup = new ButtonGroup();
         buttonGroup.add(radioButton_eps);
@@ -478,13 +470,13 @@ public class MainForm extends JFrame {
     private JSpinner spinner_eps;
     private JSpinner spinner_count;
     private JSeparator separator3;
-    private JRadioButton radioButton_derivate;
-    private JRadioButton radioButton_integral;
+    private JCheckBox radioButton_derivate;
+    private JCheckBox radioButton_integral;
     private JRadioButton radioButton_eps;
     private JRadioButton radioButton_count;
-    private JRadioButton radioButton_original;
-    private JRadioButton radioButton_root;
-    private JRadioButton radioButton_extremeValue;
+    private JCheckBox radioButton_original;
+    private JCheckBox radioButton_root;
+    private JCheckBox radioButton_extremeValue;
     private JSpinner spinner_iteration;
     private JLabel label4;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
