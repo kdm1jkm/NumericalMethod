@@ -4,8 +4,8 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {seq {space :::p, par l {comp label1::l:p::p, comp progressBar::l:p:288:p}, space ::4:x}}"
-			"$verticalGroup": "par l {seq l {space :::p, comp label1:::p::p, space u:::p, comp progressBar:::p::p, space ::9:x}}"
+			"$horizontalGroup": "par l {seq {space :::p, par l {seq {comp label1:::p::p, space :0:219:x}, comp progressBar::l::286:x}, space :::p}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp label1:::p::p, space ::15:x, comp progressBar:::p:4:p, space :::p}}"
 		} ) {
 			name: "this"
 			"title": "Generation..."

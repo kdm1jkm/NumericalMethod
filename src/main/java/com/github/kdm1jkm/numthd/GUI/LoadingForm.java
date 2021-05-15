@@ -59,18 +59,20 @@ public class LoadingForm extends JDialog {
                 .addGroup(contentPaneLayout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(label1)
-                        .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE))
-                    .addContainerGap(4, Short.MAX_VALUE))
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(label1)
+                            .addGap(0, 219, Short.MAX_VALUE))
+                        .addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
+                    .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(label1)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(9, Short.MAX_VALUE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                    .addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 4, GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
